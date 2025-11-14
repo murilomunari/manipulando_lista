@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 
 function App() {
@@ -7,11 +7,15 @@ function App() {
     task: ''
   })
   const [input, setInput] = useState ("")
-  const [tasks, setTasks] = useState ([
-    'Estudar React',
-    'Fazer compras',
-    'Ler um livro'
-  ])
+  const [tasks, setTasks] = useState<string[]>([])
+
+  useEffect ( () => { // useEffect para monitorar mudanças no estado
+    const tarefaSalvas = localStorage.getItem("tarefas")
+    
+    if(tarefaSalvas) {
+      setTasks(JSON.parse(tarefaSalvas)) // JSON.parse para converter de volta para array
+    }
+  }, [])
 
 
   function handleResgister() {
@@ -28,6 +32,7 @@ function App() {
 
     setTasks(tarefas => [...tarefas, input])
     setInput("") // para limpar o input após adicionar a tarefa
+    localStorage.setItem("tarefas", JSON.stringify([...tasks, input]))
   }
 
   function handleSaveEdit() {
@@ -42,11 +47,13 @@ function App() {
       task: ''
     })
     setInput("");
+    localStorage.setItem("tarefas", JSON.stringify(allTasks))
   }
 
   function handleDelete(item: string) {
     const removeTask = tasks.filter ( task => task !== item) // !== e para diferente
     setTasks(removeTask)
+    localStorage.setItem("tarefas", JSON.stringify(removeTask))
   }
 
   function handleEdit(item: string) {
