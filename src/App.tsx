@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 
 function App() {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const firstRender = useRef(true);
   const [editTask, setEditTask] = useState ({
     enabled: false,
     task: ''
@@ -16,6 +18,16 @@ function App() {
       setTasks(JSON.parse(tarefaSalvas)) // JSON.parse para converter de volta para array
     }
   }, [])
+
+  useEffect ( () => {
+
+    if(firstRender.current) {
+      firstRender.current = false;
+      return;
+    }
+
+    localStorage.setItem("tarefas", JSON.stringify(tasks)) // JSON.stringify para converter array em string
+  }, [tasks])
 
 
   function handleResgister() {
@@ -32,7 +44,7 @@ function App() {
 
     setTasks(tarefas => [...tarefas, input])
     setInput("") // para limpar o input após adicionar a tarefa
-    localStorage.setItem("tarefas", JSON.stringify([...tasks, input]))
+    
   }
 
   function handleSaveEdit() {
@@ -47,16 +59,19 @@ function App() {
       task: ''
     })
     setInput("");
-    localStorage.setItem("tarefas", JSON.stringify(allTasks))
+    
   }
 
   function handleDelete(item: string) {
     const removeTask = tasks.filter ( task => task !== item) // !== e para diferente
     setTasks(removeTask)
-    localStorage.setItem("tarefas", JSON.stringify(removeTask))
+    
   }
 
   function handleEdit(item: string) {
+  
+    inputRef.current?.focus();
+
     setInput(item)
     setEditTask({
       enabled: true,
@@ -72,6 +87,7 @@ function App() {
         placeholder="Digite o nome da tarefa" 
         value={input}
         onChange={ (e)  => setInput(e.target.value)}
+        ref={inputRef}
         />
         <button onClick={handleResgister}>{editTask.enabled ? "Atualizar tarefa" : "Adicionar tarefa"}</button>
         
