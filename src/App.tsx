@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 
 
 function App() {
@@ -30,7 +30,7 @@ function App() {
   }, [tasks])
 
 
-  function handleResgister() {
+  const handleResgister = useCallback ( () => { // useCallback para memorizar a função
     if(!input) {
       alert("Por favor, digite uma tarefa")
       return;
@@ -44,8 +44,7 @@ function App() {
 
     setTasks(tarefas => [...tarefas, input])
     setInput("") // para limpar o input após adicionar a tarefa
-    
-  }
+  }, [input, tasks])
 
   function handleSaveEdit() {
     const findIndex = tasks.findIndex ( task => task === editTask.task)
@@ -79,6 +78,10 @@ function App() {
     })
   }
 
+  const totalTarefas = useMemo ( () => { // useMemo para memorizar o valor calculado
+    return tasks.length
+  }, [tasks])
+
   return (
     <div>
       <h1>Listas de tarefas</h1>
@@ -92,6 +95,8 @@ function App() {
         <button onClick={handleResgister}>{editTask.enabled ? "Atualizar tarefa" : "Adicionar tarefa"}</button>
         
       <hr />
+
+      <strong>Você tem {totalTarefas} tarefas</strong>
 
       {tasks.map( (item, index) => (
         <section key={item}>
